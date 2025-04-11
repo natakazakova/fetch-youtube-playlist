@@ -107,6 +107,10 @@ async function fetchAndDisplayVideos(API_KEY, PLAYLIST_ID) {
     const playlistTitle = await fetchPlaylistDetails(API_KEY, PLAYLIST_ID);
     document.getElementById('playlistHeader').innerText = `${playlistTitle}`;
 
+    // Show the info message before loading the grid
+    const infoMessage = document.getElementById('infoMessage');
+    infoMessage.style.display = 'block';
+
     getVideosWithDetails(API_KEY, PLAYLIST_ID).then(videos => {
         $("#gridContainer").dxDataGrid({
             dataSource: videos,
@@ -139,5 +143,8 @@ async function fetchAndDisplayVideos(API_KEY, PLAYLIST_ID) {
                 pageSize: 100
             }
         });
+
+    // Hide the info message when the grid is displayed
+    infoMessage.style.display = 'none';
     });
 }
