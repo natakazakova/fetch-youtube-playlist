@@ -37,23 +37,50 @@
     });
 })();
 
-
 async function fetchPlaylistVideos(API_KEY, PLAYLIST_ID) {
-    const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${PLAYLIST_ID}&key=${API_KEY}`);
-    const data = await response.json();
-    return data.items;
+    try {
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${PLAYLIST_ID}&key=${API_KEY}`);
+        const data = await response.json();
+        if (data.error) {
+            throw new Error(`${data.error.message}.`);
+        }
+        return data.items;
+    } catch (error) {
+        console.error("Error fetching playlist videos:", error.message);
+        alert(`Error fetching playlist videos: ${error.message}`);
+        return [];
+    }
 }
 
 async function fetchPlaylistDetails(API_KEY, PLAYLIST_ID) {
-    const response = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${PLAYLIST_ID}&key=${API_KEY}`);
-    const data = await response.json();
-    return data.items[0].snippet.title;
+    try {
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${PLAYLIST_ID}&key=${API_KEY}`);
+        const data = await response.json();
+        if (data.error) {
+            throw new Error(`${data.error.message}.`);
+        } else if (!data.items || data.items.length === 0) {
+            throw new Error("Invalid playlist ID or no playlist details found.");
+        }
+        return data.items[0].snippet.title;
+    } catch (error) {
+        console.error("Error fetching playlist details:", error.message);
+        return "Unknown Playlist";
+    }
 }
 
 async function fetchVideoDetails(API_KEY, videoIds) {
-    const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds.join(',')}&key=${API_KEY}`);
-    const data = await response.json();
-    return data.items;
+    try {
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds.join(',')}&key=${API_KEY}`);
+        const data = await response.json();
+        if (data.error) {
+            throw new Error(`${data.error.message}.`);
+        }
+        return data.items;
+    } catch (error) {
+        console.error("Error fetching video details:", error.message);
+        alert(`Error fetching video details: ${error.message}`);
+        return [];
+    }
 }
 
 async function getVideosWithDetails(API_KEY, PLAYLIST_ID) {
@@ -107,9 +134,9 @@ async function fetchAndDisplayVideos(API_KEY, PLAYLIST_ID) {
                 groupItems: [{
                     summaryType: "count"
                 }]
-            },                    
+            },
             paging: {
-                pageSize: 150
+                pageSize: 100
             }
         });
     });
